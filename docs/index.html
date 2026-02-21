@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Integrity Benchmark — L4 Value Rankings</title>
   <style>
-    :root {
+    :root,
+    [data-theme="dark"] {
       --bg: #0f1117;
       --surface: #1a1d27;
       --surface2: #22263a;
@@ -16,6 +17,22 @@
       --text2: #8b90a8;
       --text3: #5a5f7a;
       --radius: 10px;
+      --header-bg: linear-gradient(135deg, #0f1117 0%, #1a1d27 100%);
+      --select-arrow: %238b90a8;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface2: #eef0f4;
+      --border: #d8dbe4;
+      --accent: #3b6fd4;
+      --accent2: #5b3fd4;
+      --text: #1a1d27;
+      --text2: #5a5f7a;
+      --text3: #8b90a8;
+      --header-bg: linear-gradient(135deg, #ffffff 0%, #f0f2f7 100%);
+      --select-arrow: %235a5f7a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +47,7 @@
 
     /* ── Header ── */
     header {
-      background: linear-gradient(135deg, #0f1117 0%, #1a1d27 100%);
+      background: var(--header-bg);
       border-bottom: 1px solid var(--border);
       padding: 20px 32px;
       display: flex;
@@ -112,7 +129,7 @@
       padding: 8px 10px;
       cursor: pointer;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b90a8'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='var(--select-arrow)'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 10px center;
       padding-right: 28px;
@@ -270,6 +287,21 @@
     .t-power         { color: #ef4444; }
     .t-hedonism      { color: #a855f7; }
 
+    [data-theme="light"] .t-universalism  { color: #2563a8; }
+    [data-theme="light"] .t-benevolence   { color: #1a8a80; }
+    [data-theme="light"] .t-security      { color: #2a8040; }
+    [data-theme="light"] .t-self-direction{ color: #6d28d9; }
+    [data-theme="light"] .t-achievement   { color: #b87708; }
+    [data-theme="light"] .t-conformity    { color: #4b5563; }
+    [data-theme="light"] .t-tradition     { color: #7c2d12; }
+    [data-theme="light"] .t-stimulation   { color: #c2185b; }
+    [data-theme="light"] .t-power         { color: #b91c1c; }
+    [data-theme="light"] .t-hedonism      { color: #6d28d9; }
+
+    [data-theme="light"] .rank-num.top1 { color: #b8860b; }
+    [data-theme="light"] .rank-num.top2 { color: #6b7280; }
+    [data-theme="light"] .rank-num.top3 { color: #92400e; }
+
     /* ── All Models Summary ── */
     .all-models-grid {
       display: grid;
@@ -351,6 +383,27 @@
     }
     footer a { color: var(--text2); text-decoration: none; }
     footer a:hover { color: var(--text); }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text2);
+      font-size: 12px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .theme-toggle .icon { font-size: 14px; }
   </style>
 </head>
 <body>
@@ -361,6 +414,10 @@
     <p>Schwartz 10-value win-rate rankings · 10 LLMs · 113,400 scenarios</p>
   </div>
   <div class="header-links">
+    <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">
+      <span class="icon" id="theme-icon">☀️</span>
+      <span id="theme-label">Light</span>
+    </button>
     <a href="https://aioq.org" target="_blank">aioq.org</a>
     <a href="https://github.com/AI-Integrity/ai-integrity-benchmark" target="_blank">GitHub</a>
     <a href="data/value_winrate_by_model.json" target="_blank">Raw JSON</a>
@@ -709,6 +766,28 @@ function renderAllModels(area, domain, severity, time) {
 ['sel-model','sel-domain','sel-severity','sel-time'].forEach(id => {
   document.getElementById(id).addEventListener('change', render);
 });
+
+// ─── Theme Toggle ────────────────────────────────────────────────────────────
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem('aio-theme');
+  if (saved) return saved;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
+  document.getElementById('theme-label').textContent = theme === 'dark' ? 'Light' : 'Dark';
+  localStorage.setItem('aio-theme', theme);
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+applyTheme(getPreferredTheme());
 
 // ─── Boot ────────────────────────────────────────────────────────────────────
 loadData();
