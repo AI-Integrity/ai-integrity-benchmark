@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+authors:
+  - family-names: "Lee"
+    given-names: "Seulki"
+    affiliation: "AI Integrity Organization (AIO)"
+title: "AI Integrity Benchmark Suite: Authority Stack Measurement"
+version: 1.0.0
+doi: 10.5281/zenodo.18631255
+date-released: 2026-02-21
+url: "https://aioq.org"
+license: CC-BY-4.0
